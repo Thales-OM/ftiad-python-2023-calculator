@@ -15,17 +15,25 @@ def tokenize(expression):
     current_token = ""
 
     for char in expression:
+        # number token
         if char.isdigit() or char == '.' or (char == '-' and (not current_token or current_token[-1] in operators)):
             current_token += char
+        # operator token
         elif char in operators:
             if current_token:
                 tokens.append(current_token)
                 current_token = ""
             tokens.append(char)
-        elif char.isspace():
-            if current_token:
-                tokens.append(current_token)
-                current_token = ""
+            current_token = ""
+
+        # elif char.isspace():
+        #     if current_token:
+        #         tokens.append(current_token)
+        #         current_token = ""
+
+        else:
+            operator_str = '"' + '","'.join(operators) + '"'
+            raise ValueError(f"Invalid input. The string should contain only digits, decimal point or operators ({operator_str}).")
 
     if current_token:
         tokens.append(current_token)
@@ -83,6 +91,8 @@ def parse_factor(tokens):
 def calculator():
     try:
         data = request.get_data(as_text=True)
+        # remove all spaces to avoid handling (space in an expression has no meaning)
+        data = data.replace(" ", "")
         result = calculate(data)
         return jsonify({'result': result})
     except Exception as e:
