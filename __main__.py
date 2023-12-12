@@ -9,6 +9,7 @@ def calculate(expression):
     return result
 
 
+# break input down into tokens: numbers (int/float), operators
 def tokenize(expression):
     operators = set("+-*/()")
     tokens = []
@@ -71,12 +72,24 @@ def parse_term(tokens):
     return result, rest
 
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+    except Exception as e:
+        raise e
+
+    return False
+
+
 def parse_factor(tokens):
     if not tokens:
         raise ValueError("Unexpected end of expression")
 
     token = tokens[0]
-    if token.isdigit() or (token[0] == '-' and token[1:].isdigit()):
+    if is_number(token):
         return float(token), tokens[1:]
     elif token == '(':
         subexpression, rest = parse_expression(tokens[1:])
